@@ -52,9 +52,10 @@
 
 		window.addEventListener("resize", onWindowResize)
 
-		var light = new THREE.PointLight(0xffffff, 1, 100);
-		light.position.set(0, 0, 10);
-		scene.add(light);
+		const dirLightIntensity = 5;
+		const dirLight = new THREE.DirectionalLight({ color: 0xffffff }, dirLightIntensity);
+		dirLight.position.set(0, 20, 50);
+		scene.add(dirLight);
 
 		/////////////////////////////
 		//         BALLONS         //
@@ -62,33 +63,78 @@
 
 		var loader = new THREE.GLTFLoader();
 
-		loader.load('uploads_files_2483092_Balloon.gltf', function (gltf) {
-			var ballon = gltf.scene;
-			scene.add(ballon);
-
-			// Position du ballon en bas de l'écran, aléatoire en x
-			var ballonPositionY = -5
-			ballon.position.y = ballonPositionY;
-
-			var targetPositionY = 5;
-			var animationDuration = 5000;
-			var animationStartTime = Date.now();
-
-			function animateBallon() {
-				var now = Date.now();
-				var elapsed = now - animationStartTime;
-				var progress = elapsed / animationDuration;
-
-				if (progress < 1) {
-					ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress;
-					requestAnimationFrame(animateBallon);
-				}
+		function createBalloon() {
+			let lienBallon;
+			
+			// Choisi aléatoirement la couleur du ballon
+			const couleursBallon = ['bleu', 'jaune', 'orange', 'rose', 'rouge', 'vert', 'violet']
+			const couleurBallon = couleursBallon[Math.floor(Math.random() * couleursBallon.length)];
+			
+			switch (couleurBallon) {
+				case 'bleu':
+					lienBallon = 'ballon_bleu.glb';
+					break;
+				case 'jaune':
+					lienBallon = 'ballon_jaune.glb';
+					break;
+				case 'orange':
+					lienBallon = 'ballon_orange.glb';
+					break;
+				case 'rose':
+					lienBallon = 'ballon_rose.glb';
+					break;
+				case 'rouge':
+					lienBallon = 'ballon_rouge.glb';
+					break;
+				case 'vert':
+					lienBallon = 'ballon_vert.glb';
+					break;
+				case 'violet':
+					lienBallon = 'ballon_violet.glb';
+					break;
 			}
 
-			animateBallon();
-		}, undefined, function (error) {
-			console.error(error);
-		});
+			loader.load(lienBallon, function (gltf) {
+				var ballon = gltf.scene;
+				scene.add(ballon);
+
+				// Position du ballon en bas de l'écran, aléatoire en x (non responsif)
+				var ballonPositionY = -5
+				ballon.position.y = ballonPositionY;
+
+				var ballonPositionX = Math.random() * 14 - 7;
+				ballon.position.x = ballonPositionX;
+
+				var targetPositionY = 5;
+				var animationDuration = 5000;
+				var animationStartTime = Date.now();
+
+				// Fait bouger le ballon de bas en haut
+				function animateBallon() {
+					var now = Date.now();
+					var elapsed = now - animationStartTime;
+					var progress = elapsed / animationDuration;
+
+					if (progress < 1) {
+						ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress;
+						requestAnimationFrame(animateBallon);
+					}
+				}
+
+				animateBallon();
+			}, undefined, function (error) {
+				console.error(error);
+			});
+		}
+
+		function createRandomBalloon() {
+			createBalloon();
+
+			var nextBalloonDelay = Math.random() * 3000;
+			setTimeout(createRandomBalloon, nextBalloonDelay);
+		}
+
+		createRandomBalloon();
 
 		/////////////////////////////
 		//          RENDU          //
