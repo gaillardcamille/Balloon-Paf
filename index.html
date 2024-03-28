@@ -66,6 +66,25 @@
 			var ballon = gltf.scene;
 			scene.add(ballon);
 
+			// Position du ballon en bas de l'écran, aléatoire en x
+			var ballonPositionY = -5
+			ballon.position.y = ballonPositionY;
+
+			var targetPositionY = 5;
+			var animationDuration = 5000;
+			var animationStartTime = Date.now();
+
+			function animateBallon() {
+				var now = Date.now();
+				var elapsed = now - animationStartTime;
+				var progress = elapsed / animationDuration;
+
+				if (progress < 1) {
+					ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress;
+					requestAnimationFrame(animateBallon);
+				}
+			}
+
 			animateBallon();
 		}, undefined, function (error) {
 			console.error(error);
