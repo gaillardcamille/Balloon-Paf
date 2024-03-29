@@ -11,6 +11,15 @@
 		body {
 			margin: 0;
 		}
+
+		#score {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
 	</style>
 
 	<title>Document</title>
@@ -18,7 +27,6 @@
 
 <body>
 	<script type="module">
-
 
 		/////////////////////////////
 		//     CAMERA ET SCENE     //
@@ -57,14 +65,23 @@
 		dirLight.position.set(0, 20, 50);
 		scene.add(dirLight);
 
+		//////////////////////////////
+		//  INTERFACE ET VARIABLES  //
+		//////////////////////////////
+
+		function updateScore() {
+			document.getElementById('score').textContent = 'Score : ' + score;
+		}
+
+		const ballons = [];
+		let ballonsRates = 0;
+		let score = 0;
+
 		/////////////////////////////
 		//         BALLONS         //
 		/////////////////////////////
 
 		var loader = new THREE.GLTFLoader();
-		const ballons = [];
-		let ballonsRates = 0;
-		let score = 0;
 
 		function createBalloon() {
 			let lienBallon;
@@ -109,7 +126,7 @@
 				var ballonPositionX = Math.random() * 14 - 7;
 				ballon.position.x = ballonPositionX;
 
-				var targetPositionY = 5;
+				var targetPositionY = 4;
 				var animationDuration = 5000;
 				var animationStartTime = Date.now();
 
@@ -170,6 +187,10 @@
 
 		createRandomBalloon();
 
+		//////////////////////////////
+		//        EVENTCLICK        //
+		//////////////////////////////
+
 		renderer.domElement.addEventListener('click', onMouseClick, false);
 
 		// Code raycaster
@@ -188,10 +209,11 @@
 				let clickedBalloon = intersects[0].object;
 				let parent = clickedBalloon.parent;
 
-				// Supprimer le ballon de son parent (généralement un Group)
 				parent.remove(clickedBalloon);
 				score += 1;
 				console.log('Score : ', score);
+
+				updateScore();
 
 				// Retirer le ballon de la liste des ballons
 				const index = ballons.indexOf(parent);
@@ -206,7 +228,6 @@
 			}
 		}
 
-
 		/////////////////////////////
 		//          RENDU          //
 		/////////////////////////////
@@ -219,6 +240,8 @@
 		animate();
 
 	</script>
+
+	<div id="score">Score : 0</div>
 </body>
 
 </html>
