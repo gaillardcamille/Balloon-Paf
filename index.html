@@ -12,14 +12,30 @@
 			margin: 0;
 		}
 
-		#score {
+		div {
             position: absolute;
-            bottom: 10px;
             right: 10px;
             background-color: rgba(255, 255, 255, 0.5);
             padding: 5px 10px;
             border-radius: 5px;
         }
+
+		#score {
+			bottom: 10px;
+		}
+		#ballonratés {
+			bottom: 50px;
+		}
+		#reaparition {
+			bottom: 90px;
+		}
+		#speed {
+			bottom: 130px;
+		}
+		#meilleurScore {
+			bottom: 10px;
+			right: 100px;
+		}
 	</style>
 
 	<title>Document</title>
@@ -69,13 +85,19 @@
 		//  INTERFACE ET VARIABLES  //
 		//////////////////////////////
 
-		function updateScore() {
+		function updateInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
+			document.getElementById('ballonratés').textContent = 'Ballons ratés : ' + ballonsRates;
+			document.getElementById('reaparition').textContent = 'Réapartion : ' + reaparition;
+			document.getElementById('speed').textContent = 'Vitesse : ' + speed;
+			document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
 		}
 
 		const ballons = [];
 		let ballonsRates = 0;
 		let score = 0;
+		let speed = 1;
+		let reaparition = 2500;
 
 		/////////////////////////////
 		//         BALLONS         //
@@ -126,7 +148,7 @@
 				var ballonPositionX = Math.random() * 14 - 7;
 				ballon.position.x = ballonPositionX;
 
-				var targetPositionY = 4;
+				var targetPositionY = 3.8;
 				var animationDuration = 5000;
 				var animationStartTime = Date.now();
 
@@ -137,37 +159,25 @@
 					var progress = elapsed / animationDuration;
 
 					if (progress < 1) {
-						ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress;
+						ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress * speed;
 						requestAnimationFrame(animateBallon);
 					}
 
 					// Vérifie si le ballon a atteint la position cible targetPositionY
-					if (Math.abs(ballon.position.y - targetPositionY) < 0.01) {
-						// ballonsRates++;
-						// console.log('Ballon ratés : ', ballonsRates);
-						// console.log(ballons.indexOf(ballon));
-						// const index = ballons.indexOf(ballon);
-						// if (index !== -1) {
-						// 	ballons.splice(index, 1);
-						// }
-						// scene.remove(ballon);
-
+					if (Math.abs(ballon.position.y - targetPositionY) < 0.1) {
 						const index = ballons.indexOf(ballon);
 						if (index === -1) {
-							// console.log(ballons.indexOf(ballon));
 							scene.remove(ballon);
-							// console.log(ballon)
 						}
 						else {
 							ballonsRates++;
 							console.log('Ballon ratés : ', ballonsRates);
-							// console.log(ballon)
-							// console.log(ballons.indexOf(ballon));
 							if (index !== -1) {
 								ballons.splice(index, 1);
 							}
 							scene.remove(ballon);
 						}
+						updateInterface();
 					}
 				}
 
@@ -178,10 +188,17 @@
 		}
 
 		function createRandomBalloon() {
-			if (ballonsRates <= 5) {
+			if (ballonsRates < 5) {
 				createBalloon();
-				var nextBalloonDelay = Math.random() * 3000;
+				var nextBalloonDelay = Math.random() * reaparition;
 				setTimeout(createRandomBalloon, nextBalloonDelay);
+				updateInterface();
+			}
+			else {
+				if (score > localStorage.getItem('stockageScore')) {
+					localStorage.setItem('stockageScore', score);
+				}
+				
 			}
 		}
 
@@ -213,7 +230,13 @@
 				score += 1;
 				console.log('Score : ', score);
 
-				updateScore();
+				if (score % 10 === 0 && score !== 0) {
+					console.log(score);
+					reaparition -= 100;
+					console.log(reaparition);
+				}
+
+				speed += 0.08;
 
 				// Retirer le ballon de la liste des ballons
 				const index = ballons.indexOf(parent);
@@ -225,6 +248,8 @@
 
 				parent = undefined;
 				clickedBalloon = undefined;
+
+				updateInterface();
 			}
 		}
 
@@ -242,6 +267,10 @@
 	</script>
 
 	<div id="score">Score : 0</div>
+	<div id="meilleurScore">Meilleur score : 0</div>
+	<div id="ballonratés">Ballons ratés : 0</div>
+	<div id="reaparition">Réapartion : 0</div>
+	<div id="speed">Vitesse : 0</div>
 </body>
 
 </html>
