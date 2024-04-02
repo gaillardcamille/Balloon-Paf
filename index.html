@@ -54,6 +54,7 @@
             font-weight: bold;
 			color: rgb(255, 0, 0);
         }
+		
 	</style>
 
 	<title>Document</title>
@@ -113,9 +114,7 @@
 
 		function updateInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
-			document.getElementById('reaparition').textContent = 'Réapartion : ' + delay;
-			document.getElementById('speed').textContent = 'Vitesse : ' + speed;
-			document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
+			//document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
 		}
 
 		const ballons = [];
