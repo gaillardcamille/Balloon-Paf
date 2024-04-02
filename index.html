@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
@@ -27,7 +27,7 @@
             border-radius: 5px;
         }
 
-        #startButton {
+        #boutonDemarrer {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -56,54 +56,55 @@
             color: rgba(255, 0, 0, 0.811);
         }
 
-        .coeur-container {
+        .conteneurCoeur {
             display: none;
-            top: 100px; /* Adjust position as needed */
+            top: 100px; 
             left: 50%;
             transform: translateX(-50%);
-            text-align: center; /* Center hearts horizontally */
+            text-align: center;
         }
+
         .coeur-container i {
             width: 10;
             height: 10;
             font-size: 25px;
-            margin-right: 5px; /* Adjust spacing between hearts */
+            margin-right: 5px; 
         }
 
-        .red-heart {
+        .coeurRouge {
             color: rgb(224, 51, 51);
         }
 
-		.gray-heart {
-			color:rgba(172, 166, 166, 0.768);
+		.coeurGris {
+			color: rgba(172, 166, 166, 0.768);
 		}
 
-		#bestScore {
+		#meilleurScore {
 			position: absolute;
-			top: calc(50% + 100px); /* Position verticale ajustable selon vos besoins */
+			top: calc(50% + 100px); 
 			left: 50%;
 			transform: translateX(-50%);
 			text-align: center;
 			font-family: 'AlloyInk', sans-serif;
-			font-size: 25px; /* Taille de police ajustable selon vos besoins */
+			font-size: 25px; 
 			color: rgba(255, 0, 0, 0.811);
 		}
 
-		#lastScore {
-			display: none; /* Initialement caché */
+		#dernierScore {
+			display: none; 
 			position: absolute;
-			top: calc(50% + 140px); /* Position verticale ajustable selon vos besoins */
+			top: calc(50% + 140px); 
 			left: 50%;
 			transform: translateX(-50%);
 			text-align: center;
 			font-family: 'AlloyInk', sans-serif;
-			font-size: 20px; /* Taille de police ajustable selon vos besoins */
+			font-size: 20px; 
 			color: rrgba(255, 149, 0, 0.811)
 		}
 
-		#title {
+		#titre {
 			position: absolute;
-			top: 5%; /* Ajustez la position verticale selon vos besoins */
+			top: 5%; 
 			left: 50%;
 			transform: translateX(-50%);
 			font-family: 'AlloyInk', sans-serif;
@@ -111,12 +112,12 @@
 			color: rgba(79, 120, 216, 0.53);
 			text-align: center;
 			text-transform: uppercase;
-			z-index: 1; /* Assurez-vous que le titre est au-dessus du bouton */
+			z-index: 1; 
 		}
 
 		#explication {
 			position: absolute;
-			top: 15%; /* Ajustez la position verticale selon vos besoins */
+			top: 15%;
 			left: 50%;
 			transform: translateX(-50%);
 			font-family: sans-serif;
@@ -124,33 +125,33 @@
 			font-style: italic;
 			color: rgba(6, 6, 6, 0.53);
 			text-align: center;
-			z-index: 1; /* Assurez-vous que le titre est au-dessus du bouton */
+			z-index: 1; 
 		}
     </style>
 
-    <title>Document</title>
+    <title>BALLOON PAF</title>
 </head>
 
 <body>
-	<div id="title">BALLOON PAF</div>
+	<div id="titre">BALLOON PAF</div>
 	<div id="explication">Appuyez sur les ballons pour les faire exploser avant<br>qu'ils atteignent la limite de l'écran !<br>Au bout de 5 loupés, c'est raté !</div>
     <div id="score">Score : 0</div>
-    <div class="coeur-container">
-        <i class="fas fa-heart red-heart"></i>
-        <i class="fas fa-heart red-heart"></i>
-        <i class="fas fa-heart red-heart"></i>
-        <i class="fas fa-heart red-heart"></i>
-        <i class="fas fa-heart red-heart"></i>
+    <div class="conteneurCoeur">
+        <i class="fas fa-heart coeurRouge"></i>
+        <i class="fas fa-heart coeurRouge"></i>
+        <i class="fas fa-heart coeurRouge"></i>
+        <i class="fas fa-heart coeurRouge"></i>
+        <i class="fas fa-heart coeurRouge"></i>
     </div>
-    <button id="startButton">JOUER</button>
-	<div id="bestScore">Meilleur score : <span id="meilleurScore">0</span></div>
-	<div id="lastScore">Dernier score : <span id="dernierScore">0</span></div>
+    <button id="boutonDemarrer">JOUER</button>
+	<div id="meilleurScore">Meilleur score : <span id="meilleurScoreValeur">0</span></div>
+	<div id="dernierScore">Dernier score : <span id="dernierScoreValeur">0</span></div>
 
 	<script type="module">
 
-		/////////////////////////////
-		//     CAMERA ET SCENE     //
-		/////////////////////////////
+		////////////////////////////
+		//     SCENE ET CAMERA    //
+		////////////////////////////
 
 		const scene = new THREE.Scene();
 		scene.background = new THREE.Color(0xa0a0a0);
@@ -186,81 +187,86 @@
 
 		window.addEventListener("resize", onWindowResize)
 
-		const ambientLight = new THREE.AmbientLight(0xffffff, 5); // Couleur blanche, intensité 0.5
-		scene.add(ambientLight);
+		////////////////////////////
+		//        LUMIERES        //
+		////////////////////////////
 
-		const dirLightIntensity = 10;
-		const dirLight = new THREE.DirectionalLight(0xffffff, dirLightIntensity); // Lumière blanche
-		dirLight.position.set(-SCREEN_WIDTH/2, -SCREEN_HEIGHT/2, 10); // Position de la lumière directionnelle
-		scene.add(dirLight);
+		const lumiereAmbiante = new THREE.AmbientLight(0xffffff, 5);
+		scene.add(lumiereAmbiante);
 
-		//////////////////////////////
-		//  INTERFACE ET VARIABLES  //
-		//////////////////////////////
+		const intensiteLumiereDirectionnelle = 10;
+		const lumiereDirectionnelle = new THREE.DirectionalLight(0xffffff, intensiteLumiereDirectionnelle);
+		lumiereDirectionnelle.position.set(-SCREEN_WIDTH/2, -SCREEN_HEIGHT/2, 10);
+		scene.add(lumiereDirectionnelle);
 
-		function updateInterface() {
+		/////////////////////////////
+		//   VALEURS ET INTERFACE  //
+		/////////////////////////////
+
+		function miseAJourInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
-			document.getElementById('meilleurScore').textContent = localStorage.getItem('stockageScore') || 0;
-			document.getElementById('dernierScore').textContent = dernierScore; // Mettre à jour le dernier score
+			document.getElementById('meilleurScoreValeur').textContent = localStorage.getItem('scoreStockage') || 0;
+			document.getElementById('dernierScoreValeur').textContent = dernierScore;
 		}
 
 		const ballons = [];
 		let ballonsRates = 0;
 		let score = 0;
-		let speed = 1;
-		let delay = 2500;
+		let vitesse = 1;
+		let delai = 2500;
 		let dernierScore = 0;
-		const ballonTypes = ['ballon_bleu.glb', 'ballon_ciel.glb', 'ballon_jaune.glb', 'ballon_rose.glb', 'ballon_rouge.glb', 'ballon_vert.glb', 'ballon_violet.glb'] ;
+		const typesBallons = ['ballon_bleu.glb', 'ballon_ciel.glb', 'ballon_jaune.glb', 'ballon_rose.glb', 'ballon_rouge.glb', 'ballon_vert.glb', 'ballon_violet.glb'] ;
 
-		/////////////////////////////
-		//         BALLONS         //
-		/////////////////////////////
+		////////////////////////////
+		//         BALLONS        //
+		////////////////////////////
 
-		// Chargement du modèle GLTF
 		var loader = new THREE.GLTFLoader();
 
-		function createNewBallon() {
-			const randomBallonIndex = Math.floor(Math.random() * ballonTypes.length);
-    		let lienBallon = ballonTypes[randomBallonIndex];
+		function creerNouveauBallon() {
+			const indexAleatoire = Math.floor(Math.random() * typesBallons.length);
+    		let lienBallon = typesBallons[indexAleatoire];
 
 			loader.load(lienBallon, function (gltf) {
 				var ballon = gltf.scene;
 				scene.add(ballon);
 				ballons.push(ballon);
 
-				var ballonPositionY = -SCREEN_HEIGHT / 2 - 90;
-				ballon.position.y = ballonPositionY;
+				// position du ballon au début aléatoire en x
+				var positionY = -SCREEN_HEIGHT / 2 - 90;
+				ballon.position.y = positionY;
 
-				var ballonPositionX = ballon.position.x = Math.random() * (SCREEN_WIDTH / 2 - 200 - (-SCREEN_WIDTH / 2 + 200)) + (-SCREEN_WIDTH / 2 + 200);
-				ballon.position.x = ballonPositionX;
+				var positionX = ballon.position.x = Math.random() * (SCREEN_WIDTH / 2 - 200 - (-SCREEN_WIDTH / 2 + 200)) + (-SCREEN_WIDTH / 2 + 200);
+				ballon.position.x = positionX;
 
-				var targetPositionY = SCREEN_HEIGHT / 2 + 80;
-				var animationDuration = 5000;
-				var animationStartTime = Date.now();
+				// animation
+				var positionCibleY = SCREEN_HEIGHT / 2 + 80;
+				var dureeAnimation = 5000;
+				var heureDebutAnimation = Date.now();
 
-				function animateBallon() {
-					var now = Date.now();
-					var elapsed = now - animationStartTime;
-					var progress = elapsed / animationDuration;
+				function animerBallon() {
+					var maintenant = Date.now();
+					var tempsEcoule = maintenant - heureDebutAnimation;
+					var progression = tempsEcoule / dureeAnimation;
 
-					if (progress < 1) {
-						ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress * speed;
-						requestAnimationFrame(animateBallon);
+					if (progression < 1) {
+						ballon.position.y = positionY + (positionCibleY - positionY) * progression * vitesse;
+						requestAnimationFrame(animerBallon);
 					}
 
-					// Vérifie si le ballon a atteint la position cible targetPositionY
-					if (Math.abs(ballon.position.y - targetPositionY) < 10) {
+					// si le ballon a été raté perte d'une vie
+					if (Math.abs(ballon.position.y - positionCibleY) < 10) {
 						const index = ballons.indexOf(ballon);
 						if (index === -1) {
 							scene.remove(ballon);
 						}
 						else {
 							ballonsRates++;
-							console.log('Ballon ratés : ', ballonsRates);
 
-							const hearts = document.querySelectorAll('.red-heart');
-							if (ballonsRates <= hearts.length) {
-								hearts[ballonsRates - 1].classList.add('gray-heart');
+							// change la couleur du coeur (via l'ajout de la classe)
+							const coeurs = document.querySelectorAll('.coeurRouge');
+							if (ballonsRates <= coeurs.length) {
+								coeurs[ballonsRates - 1].classList.add('coeurGris');
 							}
 
 							if (index !== -1) {
@@ -268,129 +274,141 @@
 							}
 							scene.remove(ballon);
 						}
-						updateInterface();
+						miseAJourInterface();
 					}
 
 				}
 
-				animateBallon();
-			}, undefined, function (error) {
-				console.error(error);
+				animerBallon();
+			}, undefined, function (erreur) {
+				console.error(erreur);
 			});
 		}
 
-		function createNewBallons() {
+		// créer des ballons sauf si +5 ratés
+		function creerNouveauxBallons() {
 			if (ballonsRates < 5) {
-				createNewBallon()
-				var prochainBallon = Math.random() * delay;
-				setTimeout(createNewBallons, prochainBallon);
+				creerNouveauBallon()
+				var prochainBallon = Math.random() * delai;
+				setTimeout(creerNouveauxBallons, prochainBallon);
 			}
 			else {
-				if (score > localStorage.getItem('stockageScore')) {
-					localStorage.setItem('stockageScore', score);
-					updateInterface();
+				// garde le meilleur score en local
+				if (score > localStorage.getItem('scoreStockage')) {
+					localStorage.setItem('scoreStockage', score);
+					miseAJourInterface();
 				}
-        		resetGame();
+        		reinitialiserJeu();
 			}
 		}
 
 		////////////////////////////
-		//       RESET GAME       //
+		//       EVENT CLICK      //
 		////////////////////////////
-
-		function resetGame() {
-			
-			dernierScore = score;
-
-			document.getElementById('lastScore').style.display = 'block';
-			document.getElementById('score').style.display = 'none';
-			document.querySelector('.coeur-container').style.display = 'none';
-			document.getElementById('bestScore').style.display = 'block';
-			document.getElementById('title').style.display = 'block';
-			document.getElementById('explication').style.display = 'block';
-
-			const hearts = document.querySelectorAll('.fas.fa-heart');
-			hearts.forEach(heart => {
-				heart.classList.remove('gray-heart');
-			});
-
-			// Afficher à nouveau le bouton "JOUER"
-			document.getElementById('startButton').style.display = 'block';
-		}
-
-		/////////////////////////////
-		//    GESTIONNAIRE CLIC    //
-		/////////////////////////////
 
 		renderer.domElement.addEventListener('click', function (event) {
 
-			const mouse = {
+			// déclare l'endroit où on va cliquer avec la souris (fonctionne en -1 1)
+			const souris = {
 				x: (event.clientX / SCREEN_WIDTH) * 2 - 1,
 				y: -(event.clientY / SCREEN_HEIGHT) * 2 + 1
 			};
 
-			const raycaster = new THREE.Raycaster();
-			raycaster.setFromCamera(mouse, camera);
+			const rayon = new THREE.Raycaster();
+			rayon.setFromCamera(souris, camera);
 
-			const rayDirection = new THREE.Vector3(mouse.x, mouse.y, -1).unproject(camera).sub(camera.position).normalize();
+			// créé un rayon (vector) perpendiculaire à la caméra vers l'endroit où on a cliqué
+			const directionRayon = new THREE.Vector3(souris.x, souris.y, -1).unproject(camera).sub(camera.position).normalize();
 
-			const intersects = raycaster.intersectObjects(scene.children, true);
+			// rajoute les objets que le rayon croise dans la scène (ici des ballons)
+			const intersects = rayon.intersectObjects(scene.children, true);
 
 			if (intersects.length > 0) {
-				let clickedBallon = intersects[0].object;
-				let parent = clickedBallon.parent;
+				let ballonClique = intersects[0].object;
+				let parent = ballonClique.parent;
 
+				// on supprime le ballon dans la liste
 				const index = ballons.indexOf(parent);
 				if (index !== -1) {
 					ballons.splice(index, 1);
 				}
 
-				parent.remove(clickedBallon);
-				scene.remove(clickedBallon);
+				// on supprime le ballon de la scène
+				parent.remove(ballonClique);
+				scene.remove(ballonClique);
 				scene.remove(parent);
 
 				parent = undefined;
-				clickedBallon = undefined;
+				ballonClique = undefined;
 
+				// on augmente la difficulté à haque ballon touché
 				score+=1;
-				speed+=0.05;
+				vitesse+=0.05;
 				if (score % 10 === 0 && score !== 0) {
-					delay -= 50;
+					delai -= 50;
 				}
 
-				updateInterface();
+				miseAJourInterface();
 			}
 		});
 
-		/////////////////////////////
-		//          RENDU          //
-		/////////////////////////////
+		///////////////////////////
+		//         RENDER        //
+		///////////////////////////
 
-		function animate() {
-			requestAnimationFrame(animate);
+		function animer() {
+			requestAnimationFrame(animer);
 			renderer.render(scene, camera);
 		}
 
-		animate();
+		animer();
 
-        document.getElementById('startButton').addEventListener('click', function() {
+		////////////////////////////
+		//         RESTART        //
+		////////////////////////////
+
+		function reinitialiserJeu() {
+			dernierScore = score;
+
+			// cache le score et les vies, affiche le titre, l'explication, le meilleur et dernier score et le bouton
+			document.getElementById('dernierScore').style.display = 'block';
+			document.getElementById('score').style.display = 'none';
+			document.querySelector('.conteneurCoeur').style.display = 'none';
+			document.getElementById('meilleurScore').style.display = 'block';
+			document.getElementById('titre').style.display = 'block';
+			document.getElementById('explication').style.display = 'block';
+
+			// remet les coeurs à la normal
+			const coeurs = document.querySelectorAll('.fas.fa-heart');
+			coeurs.forEach(coeur => {
+				coeur.classList.remove('coeurGris');
+			});
+
+			document.getElementById('boutonDemarrer').style.display = 'block';
+		}
+
+		/////////////////////////////
+		//        GAME START       //
+		/////////////////////////////
+
+        document.getElementById('boutonDemarrer').addEventListener('click', function() {
 
 			ballonsRates = 0;
 			score = 0;
-			speed = 1;
-			delay = 2500;
+			vitesse = 1;
+			delai = 2500;
 
-			document.getElementById('title').style.display = 'none';
+			document.getElementById('titre').style.display = 'none';
 			document.getElementById('explication').style.display = 'none';
-			document.getElementById('lastScore').style.display = 'none';
+			document.getElementById('dernierScore').style.display = 'none';
             document.getElementById('score').style.display = 'block';
-			document.getElementById('bestScore').style.display = 'none';
-            document.querySelector('.coeur-container').style.display = 'block'; // Show heart container
-            this.style.display = 'none'; // Hide the button
-            createNewBallons(); // Start the game
+			document.getElementById('meilleurScore').style.display = 'none';
+            document.querySelector('.conteneurCoeur').style.display = 'block'; 
+            this.style.display = 'none'; 
+            creerNouveauxBallons(); 
         });
 
-		updateInterface();
+		miseAJourInterface();
     </script>
 
 </body>
