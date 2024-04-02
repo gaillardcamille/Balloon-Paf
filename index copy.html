@@ -2,12 +2,12 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/GLTFLoader.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/GLTFLoader.js"></script>
 
-	<style>
+    <style>
 		@font-face {
 			font-family: 'AlloyInk';
 			src: url('AlloyInk-lgdWw.otf') format('opentype'),
@@ -26,6 +26,35 @@
             border-radius: 5px;
         }
 
+        #score {
+			display: none;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+			text-align: center;
+			font-family: 'AlloyInk', sans-serif;
+            font-size: 40px;
+            font-weight: bold;
+			color: rgb(255, 0, 0);
+        }
+
+        #ballonratés {
+            bottom: 50px;
+        }
+
+        #delay {
+            bottom: 90px;
+        }
+
+        #speed {
+            bottom: 130px;
+        }
+
+        #meilleurScore {
+            bottom: 10px;
+            right: 100px;
+        }
+
 		#startButton {
 			position: absolute;
 			top: 50%;
@@ -42,25 +71,14 @@
 			font-family: 'AlloyInk', sans-serif;
 			text-transform: uppercase;
 		}
+    </style>
 
-		#score {
-			display: none;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-			text-align: center;
-			font-family: 'AlloyInk', sans-serif;
-            font-size: 40px;
-            font-weight: bold;
-			color: rgb(255, 0, 0);
-        }
-	</style>
-
-	<title>Document</title>
+    <title>Document</title>
 </head>
 
 <body>
-	<button id="startButton">JOUER</button>
+    <!-- Added a start button -->
+    <button id="startButton">JOUER</button>
 
 	<script type="module">
 
@@ -113,7 +131,8 @@
 
 		function updateInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
-			document.getElementById('reaparition').textContent = 'Réapartion : ' + delay;
+			document.getElementById('ballonratés').textContent = 'Ballons ratés : ' + ballonsRates;
+			document.getElementById('delay').textContent = 'Réapartion : ' + delay;
 			document.getElementById('speed').textContent = 'Vitesse : ' + speed;
 			document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
 		}
@@ -121,8 +140,8 @@
 		const ballons = [];
 		let ballonsRates = 0;
 		let score = 0;
-		let speed = 1;
-		let delay = 2500;
+		let speed = 0.5;
+		let delay = 3000;
 
 		/////////////////////////////
 		//         BALLONS         //
@@ -131,7 +150,7 @@
 		// Chargement du modèle GLTF
 		var loader = new THREE.GLTFLoader();
 
-		function createNewBallon() {
+		function createBallon() {
 			loader.load('test.glb', function (gltf) {
 				var ballon = gltf.scene;
 				scene.add(ballon);
@@ -148,28 +167,26 @@
 				var animationStartTime = Date.now();
 
 				function animateBallon() {
-					var now = Date.now();
-					var elapsed = now - animationStartTime;
-					var progress = elapsed / animationDuration;
+				var now = Date.now();
+				var elapsed = now - animationStartTime;
+				var progress = elapsed / animationDuration;
 
-					if (progress < 1) {
-						ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress * speed;
-						requestAnimationFrame(animateBallon);
-					}
+				if (progress < 1) {
+					ballon.position.y = ballonPositionY + (targetPositionY - ballonPositionY) * progress * speed;
+					requestAnimationFrame(animateBallon);
+				}
 
 					// Vérifie si le ballon a atteint la position cible targetPositionY
-					if (Math.abs(ballon.position.y - targetPositionY) < 10) {
+					if (ballon.position.y >= (SCREEN_HEIGHT / 2)) {
 						const index = ballons.indexOf(ballon);
-						if (index === -1) {
-							scene.remove(ballon);
-						}
-						else {
+						if (index !== -1) {
 							ballonsRates++;
-							console.log('Ballon ratés : ', ballonsRates);
+							updateInterface();
+							scene.remove(ballon);
+							console.log('Ballon ratés : ', ballonsRates)
 							if (index !== -1) {
 								ballons.splice(index, 1);
 							}
-							scene.remove(ballon);
 						}
 						updateInterface();
 					}
@@ -184,7 +201,7 @@
 
 		function createNewBallons() {
 			if (ballonsRates < 5) {
-				createNewBallon()
+				createBallon()
 				var prochainBallon = Math.random() * delay;
 				setTimeout(createNewBallons, prochainBallon);
 			}
@@ -217,6 +234,13 @@
 				let clickedBallon = intersects[0].object;
 				let parent = clickedBallon.parent;
 
+				score += 1;
+				speed += 0.05;
+
+				if (score % 10 === 0 && score !== 0) {
+					delay -= 50;
+				}
+
 				const index = ballons.indexOf(parent);
 				if (index !== -1) {
 					ballons.splice(index, 1);
@@ -228,15 +252,9 @@
 
 				parent = undefined;
 				clickedBallon = undefined;
-
-				score+=1;
-				speed+=0.05;
-				if (score % 10 === 0 && score !== 0) {
-					delay -= 50;
-				}
-
-				updateInterface();
 			}
+
+			updateInterface();
 		});
 
 		/////////////////////////////
@@ -259,6 +277,10 @@
 	</script>
 
 	<div id="score">Score : 0</div>
+	<div id="meilleurScore">Meilleur score : 0</div>
+	<div id="ballonratés">Ballons ratés : 0</div>
+	<div id="delay">Réapartion : 0</div>
+	<div id="speed">Vitesse : 0</div>
 </body>
 
 </html>
