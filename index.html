@@ -77,6 +77,29 @@
 		.gray-heart {
 			color:rgba(172, 166, 166, 0.768);
 		}
+
+		#bestScore {
+			position: absolute;
+			top: calc(50% + 100px); /* Position verticale ajustable selon vos besoins */
+			left: 50%;
+			transform: translateX(-50%);
+			text-align: center;
+			font-family: 'AlloyInk', sans-serif;
+			font-size: 25px; /* Taille de police ajustable selon vos besoins */
+			color: rgba(255, 0, 0, 0.811);
+		}
+
+		#lastScore {
+			display: none; /* Initialement caché */
+			position: absolute;
+			top: calc(50% + 140px); /* Position verticale ajustable selon vos besoins */
+			left: 50%;
+			transform: translateX(-50%);
+			text-align: center;
+			font-family: 'AlloyInk', sans-serif;
+			font-size: 20px; /* Taille de police ajustable selon vos besoins */
+			color: rrgba(255, 149, 0, 0.811)
+		}
     </style>
 
     <title>Document</title>
@@ -92,6 +115,8 @@
         <i class="fas fa-heart red-heart"></i>
     </div>
     <button id="startButton">JOUER</button>
+	<div id="bestScore">Meilleur score : <span id="meilleurScore">0</span></div>
+	<div id="lastScore">Dernier score : <span id="dernierScore">0</span></div>
 
 	<script type="module">
 
@@ -133,7 +158,7 @@
 
 		window.addEventListener("resize", onWindowResize)
 
-		const ambientLight = new THREE.AmbientLight(0xffffff, 4); // Couleur blanche, intensité 0.5
+		const ambientLight = new THREE.AmbientLight(0xffffff, 5); // Couleur blanche, intensité 0.5
 		scene.add(ambientLight);
 
 		const dirLightIntensity = 10;
@@ -147,7 +172,8 @@
 
 		function updateInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
-			//document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
+			document.getElementById('meilleurScore').textContent = localStorage.getItem('stockageScore') || 0;
+			document.getElementById('dernierScore').textContent = dernierScore; // Mettre à jour le dernier score
 		}
 
 		const ballons = [];
@@ -155,6 +181,7 @@
 		let score = 0;
 		let speed = 1;
 		let delay = 2500;
+		let dernierScore = 0;
 
 		/////////////////////////////
 		//         BALLONS         //
@@ -229,12 +256,36 @@
 			else {
 				if (score > localStorage.getItem('stockageScore')) {
 					localStorage.setItem('stockageScore', score);
+					updateInterface();
 				}
+        		resetGame();
 			}
 		}
 
+		////////////////////////////
+		//       RESET GAME       //
+		////////////////////////////
+
+		function resetGame() {
+			
+			dernierScore = score;
+
+			document.getElementById('lastScore').style.display = 'block';
+			document.getElementById('score').style.display = 'none';
+			document.querySelector('.coeur-container').style.display = 'none';
+			document.getElementById('bestScore').style.display = 'block';
+
+			const hearts = document.querySelectorAll('.fas.fa-heart');
+			hearts.forEach(heart => {
+				heart.classList.remove('gray-heart');
+			});
+
+			// Afficher à nouveau le bouton "JOUER"
+			document.getElementById('startButton').style.display = 'block';
+		}
+
 		/////////////////////////////
-		//   GESTIONNAIRE CLIC    //
+		//    GESTIONNAIRE CLIC    //
 		/////////////////////////////
 
 		renderer.domElement.addEventListener('click', function (event) {
@@ -289,12 +340,22 @@
 		animate();
 
         document.getElementById('startButton').addEventListener('click', function() {
+
+			ballonsRates = 0;
+			score = 0;
+			speed = 1;
+			delay = 2500;
+
+
+			document.getElementById('lastScore').style.display = 'none';
             document.getElementById('score').style.display = 'block';
+			document.getElementById('bestScore').style.display = 'none';
             document.querySelector('.coeur-container').style.display = 'block'; // Show heart container
             this.style.display = 'none'; // Hide the button
             createNewBallons(); // Start the game
         });
 
+		updateInterface();
     </script>
 
 </body>
