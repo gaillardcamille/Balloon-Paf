@@ -169,13 +169,13 @@
 				scene.add(ballon);
 				ballons.push(ballon);
 
-				var ballonPositionY = -SCREEN_HEIGHT / 2;
+				var ballonPositionY = -SCREEN_HEIGHT / 2 - 90;
 				ballon.position.y = ballonPositionY;
 
 				var ballonPositionX = ballon.position.x = Math.random() * (SCREEN_WIDTH / 2 - 200 - (-SCREEN_WIDTH / 2 + 200)) + (-SCREEN_WIDTH / 2 + 200);
 				ballon.position.x = ballonPositionX;
 
-				var targetPositionY = SCREEN_HEIGHT / 2;
+				var targetPositionY = SCREEN_HEIGHT / 2 + 80;
 				var animationDuration = 5000;
 				var animationStartTime = Date.now();
 
