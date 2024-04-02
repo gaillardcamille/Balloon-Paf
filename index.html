@@ -100,12 +100,40 @@
 			font-size: 20px; /* Taille de police ajustable selon vos besoins */
 			color: rrgba(255, 149, 0, 0.811)
 		}
+
+		#title {
+			position: absolute;
+			top: 5%; /* Ajustez la position verticale selon vos besoins */
+			left: 50%;
+			transform: translateX(-50%);
+			font-family: 'AlloyInk', sans-serif;
+			font-size: 60px;
+			color: rgba(79, 120, 216, 0.53);
+			text-align: center;
+			text-transform: uppercase;
+			z-index: 1; /* Assurez-vous que le titre est au-dessus du bouton */
+		}
+
+		#explication {
+			position: absolute;
+			top: 15%; /* Ajustez la position verticale selon vos besoins */
+			left: 50%;
+			transform: translateX(-50%);
+			font-family: sans-serif;
+			font-size: 15px;
+			font-style: italic;
+			color: rgba(6, 6, 6, 0.53);
+			text-align: center;
+			z-index: 1; /* Assurez-vous que le titre est au-dessus du bouton */
+		}
     </style>
 
     <title>Document</title>
 </head>
 
 <body>
+	<div id="title">BALLOON PAF</div>
+	<div id="explication">Appuyez sur les ballons pour les faire exploser avant<br>qu'ils atteignent la limite de l'écran !<br>Au bout de 5 loupés, c'est raté !</div>
     <div id="score">Score : 0</div>
     <div class="coeur-container">
         <i class="fas fa-heart red-heart"></i>
@@ -182,6 +210,7 @@
 		let speed = 1;
 		let delay = 2500;
 		let dernierScore = 0;
+		const ballonTypes = ['ballon_bleu.glb', 'ballon_ciel.glb', 'ballon_jaune.glb', 'ballon_rose.glb', 'ballon_rouge.glb', 'ballon_vert.glb', 'ballon_violet.glb'] ;
 
 		/////////////////////////////
 		//         BALLONS         //
@@ -191,7 +220,10 @@
 		var loader = new THREE.GLTFLoader();
 
 		function createNewBallon() {
-			loader.load('test.glb', function (gltf) {
+			const randomBallonIndex = Math.floor(Math.random() * ballonTypes.length);
+    		let lienBallon = ballonTypes[randomBallonIndex];
+
+			loader.load(lienBallon, function (gltf) {
 				var ballon = gltf.scene;
 				scene.add(ballon);
 				ballons.push(ballon);
@@ -274,6 +306,8 @@
 			document.getElementById('score').style.display = 'none';
 			document.querySelector('.coeur-container').style.display = 'none';
 			document.getElementById('bestScore').style.display = 'block';
+			document.getElementById('title').style.display = 'block';
+			document.getElementById('explication').style.display = 'block';
 
 			const hearts = document.querySelectorAll('.fas.fa-heart');
 			hearts.forEach(heart => {
@@ -346,7 +380,8 @@
 			speed = 1;
 			delay = 2500;
 
-
+			document.getElementById('title').style.display = 'none';
+			document.getElementById('explication').style.display = 'none';
 			document.getElementById('lastScore').style.display = 'none';
             document.getElementById('score').style.display = 'block';
 			document.getElementById('bestScore').style.display = 'none';
