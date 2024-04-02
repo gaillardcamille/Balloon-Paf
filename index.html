@@ -12,7 +12,7 @@
 			margin: 0;
 		}
 
-		div {
+        div {
             position: absolute;
             right: 10px;
             background-color: rgba(255, 255, 255, 0.5);
@@ -26,7 +26,7 @@
 		#ballonratés {
 			bottom: 50px;
 		}
-		#reaparition {
+		#delay {
 			bottom: 90px;
 		}
 		#speed {
@@ -55,15 +55,17 @@
 		let SCREEN_HEIGHT = window.innerHeight;
 		let ratioLargeurHauteur = SCREEN_WIDTH / SCREEN_HEIGHT;
 
-		const camera = new THREE.PerspectiveCamera(75, ratioLargeurHauteur, 0.1, 1000);
+		const camera = new THREE.OrthographicCamera(-(SCREEN_WIDTH / 2), SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, -(SCREEN_HEIGHT / 2), 0.1, 1000);
 		camera.position.z = 5;
+		scene.add(camera)
 
 		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 		document.body.appendChild(renderer.domElement);
 
+		renderer.domElement.id = "monCanvas";
+
 		function onWindowResize() {
-			console.log("Redimensionnement de la fenêtre");
 			SCREEN_WIDTH = window.innerWidth;
 			SCREEN_HEIGHT = window.innerHeight;
 			ratioLargeurHauteur = SCREEN_WIDTH / SCREEN_HEIGHT;
@@ -88,7 +90,7 @@
 		function updateInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
 			document.getElementById('ballonratés').textContent = 'Ballons ratés : ' + ballonsRates;
-			document.getElementById('reaparition').textContent = 'Réapartion : ' + reaparition;
+			document.getElementById('delay').textContent = 'Réapartion : ' + delay;
 			document.getElementById('speed').textContent = 'Vitesse : ' + speed;
 			document.getElementById('meilleurScore').textContent = 'Meilleur score : ' + localStorage.getItem('stockageScore');
 		}
@@ -96,63 +98,32 @@
 		const ballons = [];
 		let ballonsRates = 0;
 		let score = 0;
-		let speed = 1;
-		let reaparition = 2500;
+		let speed = 0.5;
+		let delay = 3000;
 
 		/////////////////////////////
 		//         BALLONS         //
 		/////////////////////////////
 
+		// Chargement du modèle GLTF
 		var loader = new THREE.GLTFLoader();
 
-		function createBalloon() {
-			let lienBallon;
-
-			// Choisi aléatoirement la couleur du ballon
-			const couleursBallon = ['bleu', 'jaune', 'orange', 'rose', 'rouge', 'vert', 'violet']
-			const couleurBallon = couleursBallon[Math.floor(Math.random() * couleursBallon.length)];
-
-			switch (couleurBallon) {
-				case 'bleu':
-					lienBallon = 'ballon_bleu.glb';
-					break;
-				case 'jaune':
-					lienBallon = 'ballon_jaune.glb';
-					break;
-				case 'orange':
-					lienBallon = 'ballon_orange.glb';
-					break;
-				case 'rose':
-					lienBallon = 'ballon_rose.glb';
-					break;
-				case 'rouge':
-					lienBallon = 'ballon_rouge.glb';
-					break;
-				case 'vert':
-					lienBallon = 'ballon_vert.glb';
-					break;
-				case 'violet':
-					lienBallon = 'ballon_violet.glb';
-					break;
-			}
-
-			loader.load(lienBallon, function (gltf) {
+		function createBallon() {
+			loader.load('test.glb', function (gltf) {
 				var ballon = gltf.scene;
 				scene.add(ballon);
 				ballons.push(ballon);
 
-				// Position du ballon en bas de l'écran, aléatoire en x (non responsif)
-				var ballonPositionY = -5
+				var ballonPositionY = -SCREEN_HEIGHT / 2;
 				ballon.position.y = ballonPositionY;
 
-				var ballonPositionX = Math.random() * 14 - 7;
+				var ballonPositionX = ballon.position.x = Math.random() * (SCREEN_WIDTH / 2 - 200 - (-SCREEN_WIDTH / 2 + 200)) + (-SCREEN_WIDTH / 2 + 200);
 				ballon.position.x = ballonPositionX;
 
-				var targetPositionY = 3.8;
+				var targetPositionY = SCREEN_HEIGHT / 2;
 				var animationDuration = 5000;
 				var animationStartTime = Date.now();
 
-				// Fait bouger le ballon de bas en haut
 				function animateBallon() {
 					var now = Date.now();
 					var elapsed = now - animationStartTime;
@@ -164,7 +135,7 @@
 					}
 
 					// Vérifie si le ballon a atteint la position cible targetPositionY
-					if (Math.abs(ballon.position.y - targetPositionY) < 0.1) {
+					if (Math.abs(ballon.position.y - targetPositionY) < 10) {
 						const index = ballons.indexOf(ballon);
 						if (index === -1) {
 							scene.remove(ballon);
@@ -176,9 +147,11 @@
 								ballons.splice(index, 1);
 							}
 							scene.remove(ballon);
+
+							updateInterface();
 						}
-						updateInterface();
 					}
+
 				}
 
 				animateBallon();
@@ -187,71 +160,65 @@
 			});
 		}
 
-		function createRandomBalloon() {
+		function createNewBallons() {
 			if (ballonsRates < 5) {
-				createBalloon();
-				var nextBalloonDelay = Math.random() * reaparition;
-				setTimeout(createRandomBalloon, nextBalloonDelay);
-				updateInterface();
+				createBallon()
+				var prochainBallon = Math.random() * delay;
+				setTimeout(createNewBallons, prochainBallon);
 			}
 			else {
 				if (score > localStorage.getItem('stockageScore')) {
 					localStorage.setItem('stockageScore', score);
 				}
-				
 			}
 		}
 
-		createRandomBalloon();
+		createNewBallons();
 
-		//////////////////////////////
-		//        EVENTCLICK        //
-		//////////////////////////////
+		/////////////////////////////
+		//   GESTIONNAIRE CLIC    //
+		/////////////////////////////
 
-		renderer.domElement.addEventListener('click', onMouseClick, false);
+		renderer.domElement.addEventListener('click', function (event) {
 
-		// Code raycaster
-		function onMouseClick(event) {
-			const mouseX = (event.clientX / SCREEN_WIDTH) * 2 - 1;
-			const mouseY = -(event.clientY / SCREEN_HEIGHT) * 2 + 1;
+			const mouse = {
+				x: (event.clientX / SCREEN_WIDTH) * 2 - 1,
+				y: -(event.clientY / SCREEN_HEIGHT) * 2 + 1
+			};
 
-			const vector = new THREE.Vector3(mouseX, mouseY, 1);
-			vector.unproject(camera);
+			const raycaster = new THREE.Raycaster();
+			raycaster.setFromCamera(mouse, camera);
 
-			const raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+			const rayDirection = new THREE.Vector3(mouse.x, mouse.y, -1).unproject(camera).sub(camera.position).normalize();
 
-			const intersects = raycaster.intersectObjects(ballons, true);
+			const intersects = raycaster.intersectObjects(scene.children, true);
 
 			if (intersects.length > 0) {
-				let clickedBalloon = intersects[0].object;
-				let parent = clickedBalloon.parent;
+				let clickedBallon = intersects[0].object;
+				let parent = clickedBallon.parent;
 
-				parent.remove(clickedBalloon);
 				score += 1;
-				console.log('Score : ', score);
+				speed += 0.05;
 
 				if (score % 10 === 0 && score !== 0) {
-					console.log(score);
-					reaparition -= 100;
-					console.log(reaparition);
+					delay -= 50;
 				}
 
-				speed += 0.08;
-
-				// Retirer le ballon de la liste des ballons
 				const index = ballons.indexOf(parent);
 				if (index !== -1) {
 					ballons.splice(index, 1);
 				}
+
+				parent.remove(clickedBallon);
+				scene.remove(clickedBallon);
 				scene.remove(parent);
-				scene.remove(clickedBalloon);
 
 				parent = undefined;
-				clickedBalloon = undefined;
-
-				updateInterface();
+				clickedBallon = undefined;
 			}
-		}
+
+			updateInterface();
+		});
 
 		/////////////////////////////
 		//          RENDU          //
@@ -269,7 +236,7 @@
 	<div id="score">Score : 0</div>
 	<div id="meilleurScore">Meilleur score : 0</div>
 	<div id="ballonratés">Ballons ratés : 0</div>
-	<div id="reaparition">Réapartion : 0</div>
+	<div id="delay">Réapartion : 0</div>
 	<div id="speed">Vitesse : 0</div>
 </body>
 
