@@ -135,7 +135,9 @@
 <body>
 	<div id="titre">BALLOON PAF</div>
 	<div id="explication">Appuyez sur les ballons pour les faire exploser avant<br>qu'ils atteignent la limite de l'écran !<br>Au bout de 5 loupés, c'est raté !</div>
+
     <div id="score">Score : 0</div>
+
     <div class="conteneurCoeur">
         <i class="fas fa-heart coeurRouge"></i>
         <i class="fas fa-heart coeurRouge"></i>
@@ -143,7 +145,9 @@
         <i class="fas fa-heart coeurRouge"></i>
         <i class="fas fa-heart coeurRouge"></i>
     </div>
+
     <button id="boutonDemarrer">JOUER</button>
+
 	<div id="meilleurScore">Meilleur score : <span id="meilleurScoreValeur">0</span></div>
 	<div id="dernierScore">Dernier score : <span id="dernierScoreValeur">0</span></div>
 
@@ -203,18 +207,20 @@
 		//   VALEURS ET INTERFACE  //
 		/////////////////////////////
 
+		// on met à jour les différents scores affichés
 		function miseAJourInterface() {
 			document.getElementById('score').textContent = 'Score : ' + score;
 			document.getElementById('meilleurScoreValeur').textContent = localStorage.getItem('scoreStockage') || 0;
 			document.getElementById('dernierScoreValeur').textContent = dernierScore;
 		}
 
-		const ballons = [];
-		let ballonsRates = 0;
 		let score = 0;
 		let vitesse = 1;
 		let delai = 2500;
 		let dernierScore = 0;
+
+		const ballons = [];
+		let ballonsRates = 0;
 		const typesBallons = ['ballon_bleu.glb', 'ballon_ciel.glb', 'ballon_jaune.glb', 'ballon_rose.glb', 'ballon_rouge.glb', 'ballon_vert.glb', 'ballon_violet.glb'] ;
 
 		////////////////////////////
@@ -341,7 +347,7 @@
 				parent = undefined;
 				ballonClique = undefined;
 
-				// on augmente la difficulté à haque ballon touché
+				// on augmente la difficulté à chaque ballon touché
 				score+=1;
 				vitesse+=0.05;
 				if (score % 10 === 0 && score !== 0) {
